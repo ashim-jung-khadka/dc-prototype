@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>D3 Layout</title>
+
+	<link href="../../library/bootstrap.min.css" rel="stylesheet">
+	<link href="../../library/styles.css" rel="stylesheet">
+</head>
+
+<body>
+	
+	<div class="container-fluid">
+		<div class="row" id="meter">
+
+			<div class="col-md-3">
+				<div id="event-meter" class="graph">
+					<span class="graph-header">Event</span>
+					<br/>
+					<span class="graph-value">5</span>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div id="quality-meter" class="graph">
+					<span class="graph-header">Quality</span>
+					<br/>
+					<span class="graph-value">30%</span>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div id="risk-meter" class="graph">
+					<span class="graph-header">Risk</span>
+					<br/>
+					<span class="graph-value">1.2</span>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div id="financial-meter" class="graph active">
+					<span class="graph-header">Financial</span>
+					<br/>
+					<span class="graph-value">70%</span>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="row">
+			<div class="col-md-12 form-inline">
+				<label for="claimType">Claim Type : </label>
+
+				<select id="claimType">
+					<option data-toggle="tab" value="0">All</option>
+					<option data-toggle="tab" value="1">Medical</option>
+					<option data-toggle="tab" value="2">Pharmacy</option>
+					<option data-toggle="tab" value="1">Dental</option>
+					<option data-toggle="tab" value="1">STD</option>
+				</select>
+
+				<ul id="myTab" style="list-style: none;">
+					<li class="active"><a href="#all"></a></li>
+					<li><a href="#med"></a></li>
+					<li><a href="#rx"></a></li>
+					<li><a href="#dental"></a></li>
+					<li><a href="#std"></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="row" id="row-chart">
+			<div class="tab-content">
+				<div class="tab-pane active" id="all">
+					<div class="col-md-4">
+						<header class="green-bg">Paid By Claim Type</header>
+						<section id="row-chart-claim">Claim Type</section>
+					</div>
+
+					<div class="col-md-4">
+						<header class="orange-bg">Paid By Paid of Service</header>
+						<section id="row-chart-service">Service</section>
+					</div>
+
+					<div class="col-md-4">
+						<header class="blue-bg">Cost Sharing Expense</header>
+						<section id="row-chart-cost">Expense</section>
+					</div>
+				</div> <!-- all div -->
+
+				<div class="tab-pane" id="med">
+					<div class="col-md-3">
+						<header class="green-bg">Paid By Diagnosis Group</header>
+						<section id="row-chart-diagnosis">Diagnosis Group</section>
+					</div>
+
+					<div class="col-md-3">
+						<header class="orange-bg">Paid By Procedure Group</header>
+						<section id="row-chart-procedure">Procedure Group</section>
+					</div>
+
+					<div class="col-md-3">
+						<header class="red-bg">Paid By Physician Specialty</header>
+						<section id="row-chart-specialty">Physician Specialty</section>
+					</div>
+
+					<div class="col-md-3" id="row-chart-event">
+						<header class="blue-bg">Paid By Event Type</header>
+						<section id="row-chart-event">Event Type</section>
+					</div>
+				</div> <!-- med div -->
+
+				<div class="tab-pane" id="rx">
+					<div class="col-md-3">
+						<header class="green-bg">Paid By Rx Class</header>
+						<section id="row-chart-diagnosis">Rx Class</section>
+					</div>
+
+					<div class="col-md-3">
+						<header class="orange-bg">Paid By Drug Type(Generic vs Branded)</header>
+						<section id="row-chart-procedure">Drug Type</section>
+					</div>
+
+					<div class="col-md-3">
+						<header class="red-bg">Paid By Prescriber Specialty</header>
+						<section id="row-chart-specialty">Prescriber Specialty</section>
+					</div>
+
+					<div class="col-md-3" id="row-chart-event">
+						<header class="blue-bg">Paid By Prescriber</header>
+						<section id="row-chart-prescriber">Prescriber</section>
+					</div>
+				</div> <!-- rx div -->
+			</div> <!-- tab-content div -->
+		</div> <!-- row-chart div -->
+
+		<div class="row">
+			<div class="col-md-12">
+
+				<div id="daily-trend">
+				
+					<header>Daily Trend</header>
+				
+					<section id="line-chart">
+						Line Chart
+					</section>
+
+					<section id="bar-chart">
+						Bar Chart
+					</section>	
+
+				</div>
+				
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				
+				<div class="note">
+					All records selected. Please click on the graph to apply filters.
+				</div>
+
+				<table class="table table-hover dc-data-table dc-chart">
+					<thead>
+						<tr>
+							<th class="dc-table-head">Claim Number</th>
+							<th class="dc-table-head">Provider</th>
+							<th class="dc-table-head">Diagnosis</th>
+							<th class="dc-table-head">Procedure</th>
+							<th class="dc-table-head">Service Date</th>
+							<th class="dc-table-head">Paid Amount</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="dc-table-group info">	
+							<td class="dc-table-label" colspan="6">2013/12</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_237007808901017551628</td>
+							<td class="dc-table-column _1">Provider - 330126309</td>
+							<td class="dc-table-column _2">Diabetes Mellitus</td>
+							<td class="dc-table-column _3">Lab - Blood Tests</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:00</td>
+							<td class="dc-table-column _5">7.23</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_243051841801018283774</td>
+							<td class="dc-table-column _1">QUINN, EILEEN MD</td>
+							<td class="dc-table-column _2">Glaucoma</td>
+							<td class="dc-table-column _3">Other Professional Services</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:01</td>
+							<td class="dc-table-column _5">229.69</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_243051753101018284833</td>
+							<td class="dc-table-column _1">Provider - 330544222</td>
+							<td class="dc-table-column _2">Misc Urinary Diseases</td>
+							<td class="dc-table-column _3">Lab - Other</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:02</td>
+							<td class="dc-table-column _5">4.83</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_243051753101018284838</td>
+							<td class="dc-table-column _1">Provider - 330544222</td>
+							<td class="dc-table-column _2">Misc Urinary Diseases</td>
+							<td class="dc-table-column _3">Lab - Other</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:03</td>
+							<td class="dc-table-column _5">4.53</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_243051753101018284839</td>
+							<td class="dc-table-column _1">Provider - 330544222</td>
+							<td class="dc-table-column _2">Misc Urinary Diseases</td>
+							<td class="dc-table-column _3">Lab - Other</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:04</td>
+							<td class="dc-table-column _5">4.51</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_263778277101017557025</td>
+							<td class="dc-table-column _1">Provider - 330252812</td>
+							<td class="dc-table-column _2">Intervertebral Disc Disorders</td>
+							<td class="dc-table-column _3">Musculoskeletal Procedures</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:05</td>
+							<td class="dc-table-column _5">27.97</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_243051754801018288489</td>
+							<td class="dc-table-column _1">Provider - 330030176</td>
+							<td class="dc-table-column _2">Misc Urinary Diseases</td>
+							<td class="dc-table-column _3">Office Visit - Established Patient</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:06</td>
+							<td class="dc-table-column _5">80.9</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_243051754801018288490</td>
+							<td class="dc-table-column _1">Provider - 330030176</td>
+							<td class="dc-table-column _2">Misc Urinary Diseases</td>
+							<td class="dc-table-column _3">Lab - Body Fluid Exam</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:07</td>
+							<td class="dc-table-column _5">4.43</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_243051799201018288560</td>
+							<td class="dc-table-column _1">Provider - 330030176</td>
+							<td class="dc-table-column _2">Misc Urinary Diseases</td>
+							<td class="dc-table-column _3">Urology</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:08</td>
+							<td class="dc-table-column _5">14.76</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_264329360701017558593</td>
+							<td class="dc-table-column _1">Provider - 330095343</td>
+							<td class="dc-table-column _2">Neuropathies</td>
+							<td class="dc-table-column _3">Physical Therapy</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:09</td>
+							<td class="dc-table-column _5">13.5</td>
+						</tr>
+						<tr>
+							<td class="dc-table-column _0">Y_264605137201017559188</td>
+							<td class="dc-table-column _1">Provider - 330074897</td>
+							<td class="dc-table-column _2">Osteoarthritis</td>
+							<td class="dc-table-column _3">Musculoskeletal Procedures</td>
+							<td class="dc-table-column _4">10.09.2012 00:00:10</td>
+							<td class="dc-table-column _5">10.65</td>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+
+	</div>
+
+	<script src="../../library/jquery.min.js"></script>
+	<script src="../../library/bootstrap.min.js"></script>
+
+	<script src="stock.js"></script>
+
+	<script type="text/javascript">
+		$( document ).ready(function() {
+			$(function () {
+				$('[data-toggle="tooltip"]').tooltip()
+			});
+
+			$('#claimType').on('change', function(e) {
+				$('#myTab li a').eq($(this).val()).tab('show');
+			});
+		});
+	</script>
+</body>
+
+</html>

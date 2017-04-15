@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>dc.js - Row Chart Example</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="../library/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../library/dc.css" />
+	<style>
+	#monthly-volume-chart g.y {
+		display: none;
+	}
+	
+	#logo {
+		margin-right: 2em;
+		margin-top: 2em;
+	}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div id="rowChart">
+					<!-- <strong>Claim Type</strong>
+				<a class="reset" href="javascript:rowChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+				<div class="clearfix"></div> -->
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div id="monthly-chart"></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div id="monthly-volume-chart"></div>
+			</div>
+		</div>
+		<div class="row">
+			<div>
+				<div class="dc-data-count">
+					<span class="filter-count"></span> selected out of <span class="total-count"></span> records | <a href="javascript:dc.filterAll(); dc.renderAll();">Reset All</a>
+				</div>
+			</div>
+			<table class="table table-hover dc-data-table">
+			</table>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="../library/d3-3.5.17.js"></script>
+	<script type="text/javascript" src="../library/crossfilter-1.3.14.js"></script>
+	<script type="text/javascript" src="../library/dc-2.1.4.js"></script>
+
+	<script type="text/javascript">
+	var nasdaqCount = dc.dataCount('.dc-data-count');
+	var nasdaqTable = dc.dataTable('.dc-data-table');
+
+	d3.csv("../data/test.csv", function(data) {
+
+		var dateFormat = d3.time.format('%m/%d/%Y');
+		var numberFormat = d3.format('.2f');
+
+		data.forEach(function(d) {
+			d.amount = +d.PAIDAMT;
+			d.date = dateFormat.parse(d.SERVICEDATE);
+			d.month = d.date.getMonth();
+		});
+
+		var ndx = crossfilter(data);
+		var all = ndx.groupAll();
+
+		var clmDimension = ndx.dimension(function(d) {
+			return d.CLMTYPEDESC;
+		});
+		var clmGroup = clmDimension.group();
+
+
+		var rowChart = dc.rowChart('#rowChart');
+		rowChart
+			.width(300)
+			.height(200)
+			.margins({
+				top: 20,
+				left: 10,
+				right: 10,
+				bottom: 20
+			})
+			.group(clmGroup)
+			.dimension(clmDimension)
+			.label(function(d) {
+				return d.key;
+			})
+			.title(function(d) {
+				return '$' + d.value;
+			})
+			.elasticX(true)
+			.xAxis().ticks(4);
+
+		var moveMonths = ndx.dimension(function(d) {
+			return d.date;
+		});
+
+		var monthlyMoveGroup = moveMonths.group().reduceSum(function(d) {
+			return Math.round(d.amount);
+		});
+
+		// console.log(monthlyMoveGroup.all());
+
+		var volumeByMonthGroup = moveMonths.group().reduceSum(function(d) {
+			return Math.round(d.amount);
+		});
+		var indexAvgByMonthGroup = moveMonths.group().reduce(
+			function(p, v) {
+				++p.days;
+				p.total += v.amount;
+				p.avg = Math.round(p.total / p.days);
+				return p;
+			},
+			function(p, v) {
+				--p.days;
+				p.total -= v.amount;
+				p.avg = p.days ? Math.round(p.total / p.days) : 0;
+				return p;
+			},
+			function() {
+				return {
+					days: 0,
+					total: 0,
+					avg: 0
+				};
+			}
+		);
+
+		var moveChart = dc.lineChart('#monthly-chart');
+		var volumeChart = dc.barChart('#monthly-volume-chart');
+
+		moveChart
+			.renderArea(true)
+			.width(990)
+			.height(200)
+			.transitionDuration(1000)
+			.margins({
+				top: 30,
+				right: 50,
+				bottom: 25,
+				left: 40
+			})
+			.dimension(moveMonths)
+			.mouseZoomable(true)
+			// Specify a "range chart" to link its brush extent with the zoom of the current "focus chart".
+			.rangeChart(volumeChart)
+			.x(d3.time.scale().domain([new Date(2011, 0, 1), new Date(2015, 11, 31)]))
+			.round(d3.time.month.round)
+			.xUnits(d3.time.months)
+			.elasticY(true)
+			.renderHorizontalGridLines(true)
+			//##### Legend
+
+		// Position the legend relative to the chart origin and specify items' height and separation.
+		.legend(dc.legend().x(800).y(10).itemHeight(13).gap(5))
+			.brushOn(false)
+			// Add the base layer of the stack with group. The second parameter specifies a series name for use in the
+			// legend.
+			// The `.valueAccessor` will be used for the base layer
+			.group(indexAvgByMonthGroup, 'Monthly Index Average')
+			.valueAccessor(function(d) {
+				return d.value.avg;
+			})
+			// Stack additional layers with `.stack`. The first paramenter is a new group.
+			// The second parameter is the series name. The third is a value accessor.
+			.stack(monthlyMoveGroup, 'Monthly Index Move', function(d) {
+				return d.value;
+			})
+			// Title can be called by any stack layer.
+			.title(function(d) {
+				var value = d.value.avg ? d.value.avg : d.value;
+				if (isNaN(value)) {
+					value = 0;
+				}
+				return dateFormat(d.key) + '\n' + numberFormat(value);
+			});
+
+		volumeChart.width(990) /* dc.barChart('#monthly-volume-chart', 'chartGroup'); */
+			.height(40)
+			.margins({
+				top: 0,
+				right: 50,
+				bottom: 20,
+				left: 40
+			})
+			.dimension(moveMonths)
+			.group(volumeByMonthGroup)
+			.centerBar(true)
+			.gap(1)
+			.x(d3.time.scale().domain([new Date(2011, 0, 1), new Date(2015, 11, 31)]))
+			.round(d3.time.month.round)
+			.alwaysUseRounding(true)
+			.xUnits(d3.time.months);
+
+		nasdaqCount /* dc.dataCount('.dc-data-count', 'chartGroup'); */
+			.dimension(ndx)
+			.group(all)
+			// (_optional_) `.html` sets different html when some records or all records are selected.
+			// `.html` replaces everything in the anchor with the html given using the following function.
+			// `%filter-count` and `%total-count` are replaced with the values obtained.
+			.html({
+				some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
+					' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
+				all: 'All records selected. Please click on the graph to apply filters.'
+			});
+
+		nasdaqTable
+			.dimension(moveMonths)
+			.group(function(d) {
+				var format = d3.format('02d');
+				return d.date.getFullYear() + '/' + format((d.date.getMonth() + 1));
+			})
+			// (_optional_) max number of records to be shown, `default = 25`
+			.size(10)
+			// There are several ways to specify the columns; see the data-table documentation.
+			// This code demonstrates generating the column header automatically based on the columns.
+			.columns([{
+				label: 'Claim Number',
+				format: function(d) {
+					return d.CLMNUM;
+				}
+			}, {
+				label: 'Provider',
+				format: function(d) {
+					return d.PROVNAME;
+				}
+			}, {
+				label: 'Diagnosis',
+				format: function(d) {
+					return d.DIAGDESC;
+				}
+			}, {
+				label: 'Procedure',
+				format: function(d) {
+					return d.PROCDRUGDESC;
+				}
+			}, {
+				label: 'Service Date',
+				format: function(d) {
+					return d.SERVICEDATE;
+				}
+			}, {
+				label: 'Paid Amount',
+				format: function(d) {
+					return d.amount;
+				}
+			}])
+
+		// (_optional_) sort using the given field, `default = function(d){return d;}`
+		.sortBy(function(d) {
+				return d.date;
+			})
+			// (_optional_) sort order, `default = d3.ascending`
+			.order(d3.ascending)
+			// (_optional_) custom renderlet to post-process chart using [D3](http://d3js.org)
+			.on('renderlet', function(table) {
+				table.selectAll('.dc-table-group').classed('info', true);
+			});
+
+		dc.renderAll();
+
+		// https://github.com/square/crossfilter/wiki/API-Reference
+		// http://stackoverflow.com/questions/16767231/what-are-the-reduceadd-reducesum-reduceremove-functions-in-crossfilter-how-s
+
+	});
+	</script>
+</body>
+
+</html>
