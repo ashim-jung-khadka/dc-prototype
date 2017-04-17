@@ -27,7 +27,6 @@ select:focus {
 
 
 /*Custom Element*/
-
 #meter {
 	padding: 35px;
 	background: #eae8e8;
@@ -74,125 +73,63 @@ select:focus {
 	font-size: 12px;
 }
 
+/*Graph Elements*/
+.widget {
+	width: 284px;
+	background-color: #fff;
+	border-radius: 5px;
+	box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.3);
+}
 
-/* Graph Material */
+.widget:hover {
+	opacity: 1;
+}
 
-.graph {
-	width: 230px;
-	height: 115px;
+.chart-container {
+	padding: 25px;
+}
+
+.tool-tip {
 	position: relative;
-	text-align: center;
-	font-size: 22px;
-	overflow: hidden;
+	display: inline-block;
 }
 
-.graph:before,
-.graph:after {
-	content: '';
-	width: 229px;
-	height: 114px;
-	border: 20px solid #0ff;
-	border-top: none;
+.tool-tip .tooltiptext {
+	visibility: hidden;
+	width: 208px;
+	background-color: black;
+	color: #fff;
+	border-radius: 6px;
+	padding: 5px 0;
 	position: absolute;
-	-webkit-transition: 0.3s;
-	transition: 0.3s;
-	-webkit-transform-origin: 50% 0%;
-	transform-origin: 50% 0%;
-	border-radius: 0 0 300px 300px;
-	-webkit-animation: demo 2s;
-	animation: demo 2s;
-	left: 0;
-	top: 100%;
-	z-index: 5;
+	z-index: 1;
+	top: 4px;
+	left: 75%;
+	padding: 12px;
+	padding-left: 17px;
 }
 
-.graph:after {
-	z-index: 3;
-	border-color: rgba(0, 0, 0, 0.15);
-	-webkit-transform: rotate(180deg);
-	transform: rotate(180deg);
+.tool-tip .tooltiptext::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	right: 100%;
+	margin-top: -5px;
+	border-width: 5px;
+	border-style: solid;
+	border-color: transparent black transparent transparent;
 }
 
-.graph:hover:before,
-.graph:hover > span {
-	opacity: 1.0;
-	cursor: pointer;
+.tool-tip:hover .tooltiptext {
+	visibility: visible;
 }
 
-.graph:before {
-	-webkit-transform: rotate(100deg);
-	transform: rotate(100deg);
-	opacity: .2;
-}
-
-@-webkit-keyframes demo {
-	0% {
-		-webkit-transform: rotate(0deg);
-		transform: rotate(0deg);
-	}
-	50% {
-		-webkit-transform: rotate(180deg);
-		transform: rotate(180deg);
-	}
-}
-
-@keyframes demo {
-	0% {
-		-webkit-transform: rotate(0deg);
-		transform: rotate(0deg);
-	}
-	50% {
-		-webkit-transform: rotate(180deg);
-		transform: rotate(180deg);
-	}
-}
-
-.graph-header {
+.header {
 	font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
-	line-height: 83px;
-	opacity: .4;
+	font-size: 25px;
 }
 
-.graph-value {
+.content {
 	font-family: Candara, Calibri, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 	font-size: 50px;
-	line-height: 0px;
-	opacity: .4;
-}
-
-.active:before,
-.active > span {
-	opacity: 1.0;
-}
-
-#event-meter:before {
-	border-color: #41940c;
-}
-
-#event-meter>.graph-value {
-	color: #41940c;
-}
-
-#quality-meter:before {
-	border-color: #009688;
-}
-
-#quality-meter>.graph-value {
-	color: #009688;
-}
-
-#risk-meter:before {
-	border-color: #d45600;
-}
-
-#risk-meter>.graph-value {
-	color: #d45600;
-}
-
-#financial-meter:before {
-	border-color: #3f51b5;
-}
-
-#financial-meter>.graph-value {
-	color: #3f51b5;
 }
